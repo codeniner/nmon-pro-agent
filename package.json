@@ -1,0 +1,26 @@
+{
+  "name": "nmon-pro-agent",
+  "version": "1.0.0",
+  "description": "The nMon Pro monitoring agent",
+  "main": "agent.js",
+  "scripts": {
+    "build": "esbuild agent.js --bundle --platform=node --outfile=build/agent.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codeniner/nmon-pro-agent.git"
+  },
+  "author": "Codeniner",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codeniner/nmon-pro-agent/issues"
+  },
+  "homepage": "https://github.com/codeniner/nmon-pro-agent#readme",
+  "dependencies": {
+    "systeminformation": "^5.22.7"
+  },
+  "devDependencies": {
+    "esbuild": "0.20.2"
+  }
+}
