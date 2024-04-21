@@ -26,7 +26,7 @@ To build the agent follow this steps:
 
 You can find the build file at `build/agent.js`.  
 
-To run the agent: `node build/agent.js`
+To run the agent: `node build/agent.js [gateway] [serverkey]`
 
 
 ## Create single executable builds
@@ -58,33 +58,36 @@ On Windows:
 
 4. Inject the blob into the node executable
 
-On Linux:
+ > Make sure the build/agent or build/agent.exe (windows) is writable before injecting.
+
+On Linux:  
 `npx postject build/agent NODE_SEA_BLOB build/agent.blob \
     --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2`
 
 
-On Windows - PowerShell:
+On Windows - PowerShell:  
 ``npx postject build/agent.exe NODE_SEA_BLOB build/agent.blob `
     --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2``
 
 
-On Windows - Command Prompt:
+On Windows - Command Prompt:  
 `npx postject build/agent.exe NODE_SEA_BLOB build/agent.blob ^
     --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 `
 
 
-On macOS:
+On macOS:  
 `npx postject build/agent NODE_SEA_BLOB build/agent.blob \
     --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 \
     --macho-segment-name NODE_SEA`
 
 5. Sign the binary (macOS and Windows only)
 
-On macOS:
+On macOS:  
 `codesign --sign - build/agent`
 
-On Windows (optional): 
+On Windows (optional):  
 > A certificate needs to be present for this to work. However, the unsigned binary would still be runnable.  
+
 `signtool sign /fd SHA256 build/agent.exe `
 
 8. Run the binary
