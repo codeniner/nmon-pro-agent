@@ -49,10 +49,10 @@ On Windows
 
 3. Remove the signature of the binary (macOS and Windows only):
 
-On macOS:
+On macOS:  
 `codesign --remove-signature build/agent`
 
-On Windows:
+On Windows:  
 `signtool remove /s build/agent.exe`
 
 
@@ -92,8 +92,10 @@ On Windows (optional):
 
 8. Run the binary
 
-On systems other than Windows:
+On systems other than Windows:  
 `./build/agent run <gateway> <serverkey>`
 
-On Windows
+On Windows  
 `.\build\agent.exe run <gateway> <serverkey>`
+
+
