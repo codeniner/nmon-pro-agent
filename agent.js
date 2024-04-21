@@ -2,8 +2,10 @@ const si = require('systeminformation');
 const fs = require('fs');
 const https = require('https');
 
-let gateway = process.argv[2];
-let serverkey = process.argv[3];
+
+let action = process.argv[2];
+let gateway = process.argv[3];
+let serverkey = process.argv[4];
 
 async function init_stats() {
     console.log('start init_stats');
@@ -71,6 +73,20 @@ function run() {
     
 }
 
-init_stats();
 
-setTimeout(run, 1000);
+if(action == 'run') {
+    init_stats();
+    setTimeout(run, 1000);
+}
+
+if(!action) {
+
+    if (typeof sea !== 'undefined') {
+        console.log('Usage: agent run <gateway> <serverkey>');
+    } else {
+        console.log('Usage: node agent.js run <gateway> <serverkey>');
+    }
+
+    
+}
+
