@@ -1,3 +1,5 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const si = require('systeminformation');
 const fs = require('fs');
 const axios = require('axios');
@@ -6,6 +8,7 @@ let agent_version = '1.0.0';
 let action = process.argv[2];
 let gateway = process.argv[3];
 let serverkey = process.argv[4];
+
 
 async function init_stats() {
     console.log('Initiating stats...');
@@ -40,7 +43,7 @@ async function collect_all_other() {
     allData.bios = bios;
 
     const baseboard = await si.baseboard(); 
-    allData.baseboard = baseboard;
+    allData.baseboard = baseboard ?? null;
 
     const chassis = await si.chassis(); 
     allData.chassis = chassis;
