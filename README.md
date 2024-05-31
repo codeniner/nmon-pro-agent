@@ -3,8 +3,8 @@ The nMon Pro agent
 
 ## Build
 
-> This steps assumes you already have node and npm installed on your system. For more information on how to install node and npm please see [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
-> The minimum node version is 22
+> This steps assumes you already have node and npm installed on your system. For more information on how to install node and npm please see [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).  
+> The minimum supported node version is 22  
 
 To build the agent follow this steps:  
 
@@ -40,7 +40,7 @@ To run the agent: `node build/agent.js run <gateway> <key> <server/workstation>`
 
 ## Create single executable builds
 
-1. Generate the blob to be injected
+### 1. Generate the blob to be injected
 
 ```
 node --experimental-sea-config sea-config.json
@@ -49,7 +49,7 @@ node --experimental-sea-config sea-config.json
 This will create the blob file that will be injected in the node executable.
 
 
-2. Create a copy of the node executable and name it according to your needs
+### 2. Create a copy of the node executable and name it according to your needs
 
 On systems other than Windows  
 ```
@@ -62,7 +62,7 @@ node -e "require('fs').copyFileSync(process.execPath, 'build/agent.exe')"
 ```
 
 
-3. Remove the signature of the binary (macOS and Windows only):
+### 3. Remove the signature of the binary (macOS and Windows only):
 
 On macOS:  
 ```
@@ -75,7 +75,7 @@ signtool remove /s build/agent.exe
 ```
 
 
-4. Inject the blob into the node executable
+### 4. Inject the blob into the node executable
 
  > Make sure the build/agent or build/agent.exe (windows) is writable before injecting.
 
@@ -107,7 +107,7 @@ npx postject build/agent NODE_SEA_BLOB build/agent.blob \
     --macho-segment-name NODE_SEA
 ```
 
-5. Sign the binary (macOS and Windows only)
+### 5. Sign the binary (macOS and Windows only)
 
 On macOS:  
 ```
@@ -179,6 +179,6 @@ On Windows (PowerShell):
 New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-win-x64.exe -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>
 ```
 
-Please replace path to the <agent> <binary>, <gateway>, <key>, and <server/workstation> with your actual values.
+Please replace <gateway/>, <key/>, and <server/workstation> with your actual values.
 
 
