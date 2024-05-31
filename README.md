@@ -98,7 +98,7 @@ On Windows (optional):
 On Linux/BSD/MacOS:  
 `sudo ./agent init <gateway> <key> <server/workstation>`
 
-On Windows:  
+On Windows (elevated Command Prompt or PowerShell):  
 `agent.exe init <gateway> <key> <server/workstation>`
 
 
