@@ -125,7 +125,7 @@ On Windows
 On Linux x64 (terminal): 
 `sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-linux-x64 && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
 
-On MacOS (terminal): 
+On MacOS arm64 (terminal): 
 `sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-darwin-arm64 && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
 
 On Windows (PowerShell):  
