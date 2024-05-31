@@ -1,1 +1,1 @@
-{ "main": "build/agent.js", "output": "build/agent.blob" }
+{ "main": "build/agent.js", "output": "build/agent.blob", "disableExperimentalSEAWarning": true }

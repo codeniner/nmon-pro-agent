@@ -298,7 +298,7 @@ if(action == 'init') {
                     <key>StandardErrorPath</key>
                     <string>` + workingPath + `/error.log</string>
                     <key>StandardOutPath</key>
-                    <string>` + workingPath + `/stdout.log</string>
+                    <string>` + workingPath + `/agent.log</string>
                     <key>EnvironmentVariables</key>
                     <dict>
                         <key>PATH</key>

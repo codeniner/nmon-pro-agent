@@ -119,3 +119,12 @@ On Windows
 `agent.exe run <gateway> <key> <server/workstation>`
 
 
+### Oneline Initialize
+
+On Linux/BSD/MacOS (terminal):  
+`mkdir -p /opt/nmonpro && wget -N --no-check-certificate -O /opt/nmonpro/agent <path to the agent binary> && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
+
+On Windows (PowerShell):  
+`New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri <path to the agent binary> -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>`
+
+> Please replace <path to the agent binary>, <gateway>, <key>, and <server/workstation> with your actual values.
