@@ -26,7 +26,7 @@ To build the agent follow this steps:
 
 You can find the build file at `build/agent.js`.  
 
-To run the agent: `node build/agent.js run <gateway> <key>`
+To run the agent: `node build/agent.js run <gateway> <key> <server/workstation>`
 
 
 ## Create single executable builds

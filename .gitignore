@@ -136,3 +136,5 @@ build/
 /config.json
 /latest.json
 /node
+
+.DS_Store

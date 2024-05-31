@@ -1,4 +1,13 @@
-//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+// Suppress deprecation warnings
+process.noDeprecation = true;
+
+// Suppress all warnings
+process.emitWarning = (msg, type, code, ctor) => {
+    // Do nothing on warnings
+};
+
+// Disable SSL certificate validation
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const si = require('systeminformation');
 const fs = require('fs');
