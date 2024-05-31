@@ -132,3 +132,7 @@ dist
 #build
 
 build/
+
+/config.json
+/latest.json
+/node
