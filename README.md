@@ -4,6 +4,7 @@ The nMon Pro agent
 ## Build
 
 > This steps assumes you already have node and npm installed on your system. For more information on how to install node and npm please see [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+> The minimum node version is 22
 
 To build the agent follow this steps:  
 

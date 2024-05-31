@@ -245,7 +245,6 @@ if(action == 'init') {
                 }
             });
 
-            console.log('Done.');
         }
 
         if(platform == 'win32') {
@@ -269,7 +268,6 @@ if(action == 'init') {
                 console.log('Task created successfully.');
             });
 
-            console.log('Done.');
         }
     
         if(platform == 'darwin') {
@@ -331,15 +329,17 @@ if(action == 'init') {
                 }
             });
 
-
-            console.log('Sending first data set to the server.');
-
-            init_stats();
-            setTimeout(run, 3000);
-
-
-            console.log('Done.');
         }
+
+
+        console.log('Sending first data set to the server.');
+
+        init_stats();
+        setTimeout(run, 3000);
+
+
+        console.log('Done.');
+
 
     }
 
@@ -378,7 +378,7 @@ if(action == 'deinit') {
             });
     
             console.log('Done.');
-            
+
         });
 
 
@@ -479,6 +479,9 @@ if(action == 'run') {
     }
 }
 
+if(action == 'version') {
+    console.log('nMon Pro Agent version - ' + agent_version + ' Running on ' + platform + ' ' + os.release() + ' ' + os.arch() + ' ' + os.type() + ' ' + os.platform() + ' ' + os.version() + ' ' + os.hostname()); 
+}
 
 if(!action) {
     console.log('Action not specified.'); 
