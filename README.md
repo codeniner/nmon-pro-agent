@@ -120,12 +120,17 @@ On Windows
 `agent.exe run <gateway> <key> <server/workstation>`
 
 
-### Oneline Initialize
+### Oneline Install & Initialize
 
-On Linux/BSD/MacOS (terminal):  
-`sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent <path to the agent binary> && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
+On Linux x64 (terminal): 
+`sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-linux-x64 && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
+
+On MacOS (terminal): 
+`sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-darwin-arm64 && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
 
 On Windows (PowerShell):  
-`New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri <path to the agent binary> -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>`
+`New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-win-x64.exe -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>`
 
 > Please replace <path to the agent binary>, <gateway>, <key>, and <server/workstation> with your actual values.
+
+
