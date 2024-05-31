@@ -234,7 +234,7 @@ if(action == 'init') {
                     console.log('Cron job already exists. Skipping...');
                 } else {
                     // Add cron job
-                    exec(`(crontab -l 2>/dev/null; echo "${cron} run") | crontab -`, (error, stdout, stderr) => {
+                    exec(`(crontab -l 2>/dev/null; echo "${cron}") | crontab -`, (error, stdout, stderr) => {
                         if (error) {
                             console.error(`Error adding cron job: ${error.message}`);
                             return;
@@ -351,17 +351,39 @@ if(action == 'deinit') {
 
     if(platform == 'linux' || platform == 'freebsd' || platform == 'openbsd') {
         console.log(platform + ' detected. Removing cron job...');
-        let cron = '* * * * * ' + workingPath + '/' + fileName + ' run';
-        exec(`crontab -l | grep -v '${cron}' | crontab -`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error removing cron job: ${error.message}`);
+
+        fs.readFile(workingPath + '/config.json', 'utf8', function (err, data) {
+            if (err) {
+                console.error('Error reading config file:', err);
                 return;
             }
+            const config = JSON.parse(data);
+            const type = config.type;
+
+            let cron = "";
+            if(type == 'server') {
+                cron = '* * * * * ' + fullPath + ' run';
+            }
+            if(type == 'workstation') {
+                cron = '0 * * * * ' + fullPath + ' run';
+            }
+
+            exec(`crontab -l | grep -v '${cron}' | crontab -`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error removing cron job: ${error.message}`);
+                    return;
+                }
+                
+                console.log('Cron job removed successfully.');
+            });
+    
+            console.log('Done.');
             
-            console.log('Cron job removed successfully.');
         });
 
-        console.log('Done.');
+
+
+
     }
 
     if(platform == 'win32') {

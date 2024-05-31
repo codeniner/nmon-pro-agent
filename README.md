@@ -122,7 +122,7 @@ On Windows
 ### Oneline Initialize
 
 On Linux/BSD/MacOS (terminal):  
-`mkdir -p /opt/nmonpro && wget -N --no-check-certificate -O /opt/nmonpro/agent <path to the agent binary> && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
+`sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent <path to the agent binary> && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>`
 
 On Windows (PowerShell):  
 `New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri <path to the agent binary> -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>`
