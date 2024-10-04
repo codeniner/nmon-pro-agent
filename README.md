@@ -4,7 +4,7 @@ The nMon Pro agent
 ## Build
 
 > This steps assumes you already have node and npm installed on your system. For more information on how to install node and npm please see [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).  
-> The minimum supported node version is 22  
+> The minimum supported node version is 20  
 
 To build the agent follow this steps:  
 
@@ -38,88 +38,30 @@ You can find the build file at `build/agent.js`.
 To run the agent: `node build/agent.js run <gateway> <key> <server/workstation>`
 
 
-## Create single executable builds
 
-### 1. Generate the blob to be injected
+### Oneline Install & Initialize
 
+> The installer will automatically download a nodejs binary, the agent and will run the initialization
+> All files will be placed in \opt\nmonpro or C:\Program Files\nMon Pro for windows.
+
+On Linux/BSD/MacOS: 
 ```
-node --experimental-sea-config sea-config.json
-```
-
-This will create the blob file that will be injected in the node executable.
-
-
-### 2. Create a copy of the node executable and name it according to your needs
-
-On systems other than Windows  
-```
-cp $(command -v node) build/agent
-```
-
-On Windows  
-```
-node -e "require('fs').copyFileSync(process.execPath, 'build/agent.exe')"
+curl -L -s https://github.com/codeniner/nmon-pro-agent/releases/latest/download/installer.sh && sudo bash installer.sh <gateway> <key> <server/workstation>
 ```
 
 
-### 3. Remove the signature of the binary (macOS and Windows only):
-
-On macOS:  
+On Windows (PowerShell):  
 ```
-codesign --remove-signature build/agent
+New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-win-x64.exe -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>
 ```
 
-On Windows:  
-```
-signtool remove /s build/agent.exe
-```
+Replace <gateway/>, <key/>, and <server/workstation> with your actual values.
 
 
-### 4. Inject the blob into the node executable
 
- > Make sure the build/agent or build/agent.exe (windows) is writable before injecting.
-
-On Linux:  
-```
-npx postject build/agent NODE_SEA_BLOB build/agent.blob \
-    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
-```
+curl -L -s https://github.com/codeniner/nmon-pro-agent/releases/latest/download/installer.sh && sudo bash installer.sh https://nmon.codeniner.com 9d2af6ad-67ad-487a-97f8-0038fb850123 workstation
 
 
-On Windows - PowerShell:  
-```
-npx postject build/agent.exe NODE_SEA_BLOB build/agent.blob `
-    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
-```
-
-
-On Windows - Command Prompt:  
-```
-npx postject build/agent.exe NODE_SEA_BLOB build/agent.blob ^
-    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2
-```
-
-
-On macOS:  
-```
-npx postject build/agent NODE_SEA_BLOB build/agent.blob \
-    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 \
-    --macho-segment-name NODE_SEA
-```
-
-### 5. Sign the binary (macOS and Windows only)
-
-On macOS:  
-```
-codesign --sign - build/agent
-```
-
-On Windows (optional):  
-> A certificate needs to be present for this to work. However, the unsigned binary would still be runnable.  
-
-```
-signtool sign /fd SHA256 build/agent.exe
-```
 
 ## Use
 
@@ -127,7 +69,7 @@ signtool sign /fd SHA256 build/agent.exe
 
 On Linux/BSD/MacOS:  
 ```
-sudo ./agent init <gateway> <key> <server/workstation>
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js init <gateway> <key> <server/workstation>
 ```
 
 On Windows (elevated Command Prompt or PowerShell):  
@@ -140,7 +82,7 @@ agent.exe init <gateway> <key> <server/workstation>
 
 On Linux/BSD/MacOS:  
 ```
-sudo ./agent deinit
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js deinit
 ```
 
 On Windows:  
@@ -149,36 +91,67 @@ agent.exe deinit
 ```
 
 
+### Uninstall the agent
+
+On Linux/BSD/MacOS:  
+```
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js uninstall
+```
+
+On Windows:  
+```
+agent.exe uninstall
+```
+
+
+### Update the agent
+
+On Linux/BSD/MacOS:  
+```
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js update
+```
+
+On Windows:  
+```
+agent.exe update
+```
+
+
+### Version information
+
+On Linux/BSD/MacOS:  
+```
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js version
+```
+
+On Windows:  
+```
+agent.exe version
+```
+
+
+### Paths information
+
+On Linux/BSD/MacOS:  
+```
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js paths
+```
+
+On Windows:  
+```
+agent.exe paths
+```
+
+
+
 ### Run on demand
 
-On systems other than Windows:  
+On Linux/BSD/MacOS: 
 ```
-./agent run <gateway> <key> <server/workstation>
+sudo /opt/nmonpro/node /opt/nmonpro/agent.js run <gateway> <key> <server/workstation>
 ```
 
 On Windows  
 ```
 agent.exe run <gateway> <key> <server/workstation>
 ```
-
-
-### Oneline Install & Initialize
-
-On Linux x64 (terminal):  
-```
-sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-linux-x64 && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>
-```
-
-On MacOS arm64 (terminal):  
-```
-sudo mkdir -p /opt/nmonpro && sudo wget -N --no-check-certificate -O /opt/nmonpro/agent https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-darwin-arm64 && sudo /opt/nmonpro/agent init <gateway> <key> <server/workstation>
-```
-
-On Windows (PowerShell):  
-```
-New-Item -ItemType Directory -Force -Path C:\opt\nmonpro; Invoke-WebRequest -Uri https://github.com/codeniner/nmon-pro-agent/releases/latest/download/nMonProAgent-win-x64.exe -OutFile C:\opt\nmonpro\agent -UseBasicParsing; C:\opt\nmonpro\agent init <gateway> <key> <server/workstation>
-```
-
-Please replace <gateway/>, <key/>, and <server/workstation> with your actual values.
-
-

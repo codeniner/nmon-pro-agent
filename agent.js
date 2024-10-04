@@ -16,14 +16,14 @@ const os = require('os');
 const path = require('path');
 const { exec } = require('child_process');
 
-let agent_version = '1.0.0';
+let agent_version = '1.1.0';
 let action = process.argv[2];
 let gateway = process.argv[3];
 let key = process.argv[4];
 let type = process.argv[5]; // server or workstation
 
-const fullPath = __filename;
-const fileName = path.basename(fullPath);
+const scriptPath = __filename;
+const fileName = path.basename(scriptPath);
 const workingPath = __dirname;
 const platform = os.platform();
 
@@ -186,7 +186,22 @@ function run(collectAll = true) {
             const axiosResult = axios.post(gateway + '/api/' + type + '/' + key, allData);
             axiosResult.then(function(response) {
                 console.log(response.data);
-            });
+			
+				if(response.data.agentExecute == 'deinit') {
+					deinit();
+				}
+
+				if(response.data.agentExecute == 'update') {
+					self_update();
+				}
+
+				if(response.data.agentExecute == 'uninstall') {
+					uninstall();
+				}
+
+            }).catch(function(error) {
+				console.error(error);
+			});
             
 
         }).catch(error => console.error(error));
@@ -197,158 +212,19 @@ function run(collectAll = true) {
 }
 
 
+function self_update() {
+	console.log('Updating agent...');
 
-
-if(action == 'init') {
-
-    let config = {};
-    config.key = key;
-    config.gateway = gateway;
-    config.type = type;
-    config.lastRun = null;
-    config.runCount = 0;
-    fs.writeFile(workingPath + '/config.json', JSON.stringify(config), function (err) { });
-
-
-    if(type == 'server') {
-
-        if(platform == 'linux' || platform == 'freebsd' || platform == 'openbsd') {
-            console.log(platform + ' detected. Initializing with cron job...');
-
-            let cron = "";
-            if(type == 'server') {
-                cron = '* * * * * ' + fullPath + ' run';
-            }
-            if(type == 'workstation') {
-                cron = '0 * * * * ' + fullPath + ' run';
-            }
-            
-            // Check if cron job already exists
-            exec('crontab -l', (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error checking cron jobs: ${error.message}`);
-                    return;
-                }
-                
-                if (stdout.includes(cron)) {
-                    console.log('Cron job already exists. Skipping...');
-                } else {
-                    // Add cron job
-                    exec(`(crontab -l 2>/dev/null; echo "${cron}") | crontab -`, (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`Error adding cron job: ${error.message}`);
-                            return;
-                        }
-                        
-                        console.log('Cron job added successfully.');
-                    });
-                }
-            });
-
-        }
-
-        if(platform == 'win32') {
-            console.log(platform + ' detected. Initializing with task scheduler...');
-
-            let task = "";
-            if(type == 'server') {
-                task = 'schtasks /create /tn "nMon Pro Agent" /tr "' + fullPath + ' run" /sc minute /mo 1 /ru SYSTEM';
-            }
-            if(type == 'workstation') {
-                task = 'schtasks /create /tn "nMon Pro Agent" /tr "' + fullPath + ' run" /sc minute /mo 60 /ru SYSTEM';
-            }
-            
-            
-            exec(task, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error creating task: ${error.message}`);
-                    return;
-                }
-                
-                console.log('Task created successfully.');
-            });
-
-        }
-    
-        if(platform == 'darwin') {
-            console.log('MacOS detected. Initializing with launch daemon.');
-
-            StartInterval = 60;
-
-            if(type == 'server') {
-                StartInterval = 60;
-            }
-            if(type == 'workstation') {
-                StartInterval = 3600;
-            }
-
-            const launchdPlist = `
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-                <dict>
-                    <key>Label</key>
-                    <string>com.codeniner.nmonpro.agent</string>
-                    <key>RunAtLoad</key>
-                    <true/>
-                    <key>StartInterval</key>
-                    <integer>` + StartInterval + `</integer>
-                    <key>StandardErrorPath</key>
-                    <string>` + workingPath + `/error.log</string>
-                    <key>StandardOutPath</key>
-                    <string>` + workingPath + `/agent.log</string>
-                    <key>EnvironmentVariables</key>
-                    <dict>
-                        <key>PATH</key>
-                        <string><![CDATA[/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin]]></string>
-                    </dict>
-                    <key>WorkingDirectory</key>
-                    <string>` + workingPath + `</string>
-                    <key>ProgramArguments</key>
-                    <array>
-                        <string>` + fullPath + `</string>
-                        <string>run</string>
-                    </array>
-                </dict>
-            </plist>
-            `;
-
-            fs.writeFile('/Library/LaunchDaemons/com.codeniner.nmonpro.agent.plist', launchdPlist, function (err) {
-                if (err) {
-                    console.error('Error creating launch daemon:', err);
-                } else {
-                    console.log('Launch daemon created successfully.');
-                    exec('launchctl load /Library/LaunchDaemons/com.codeniner.nmonpro.agent.plist', (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`Error loading launch daemon: ${error.message}`);
-                            return;
-                        }
-                        
-                        console.log('Launch daemon loaded successfully.');
-                    });
-                }
-            });
-
-        }
-
-
-        console.log('Sending first data set to the server.');
-
-        init_stats();
-        setTimeout(run, 3000);
-
-
-        console.log('Done.');
-
-
-    }
+	const axiosResult = axios.get('https://github.com/codeniner/nmon-pro-agent/releases/latest/agent.js');
+	axiosResult.then(function(response) {
+		fs.writeFile(workingPath + '/agent.js', response.data, function (err) { });
+		console.log('Agent updated successfully.');
+	});
 
 
 }
 
-
-if(action == 'deinit') {
-
+function deinit() {
     if(platform == 'linux' || platform == 'freebsd' || platform == 'openbsd') {
         console.log(platform + ' detected. Removing cron job...');
 
@@ -360,12 +236,14 @@ if(action == 'deinit') {
             const config = JSON.parse(data);
             const type = config.type;
 
+			let nodePath = workingPath + '/node';
+
             let cron = "";
             if(type == 'server') {
-                cron = '* * * * * ' + fullPath + ' run';
+                cron = '* * * * * ' + nodePath + ' ' + scriptPath + ' run';
             }
             if(type == 'workstation') {
-                cron = '0 * * * * ' + fullPath + ' run';
+                cron = '0 * * * * ' + nodePath + ' ' + scriptPath + ' run';
             }
 
             exec(`crontab -l | grep -v '${cron}' | crontab -`, (error, stdout, stderr) => {
@@ -424,10 +302,28 @@ if(action == 'deinit') {
     console.log('Removing config...');
     fs.unlink(workingPath + '/config.json', function (err) { });
     console.log('Done.');
- 
-
 }
 
+function uninstall() {
+	if (fs.existsSync(workingPath + '/config.json')) {
+		console.error('Deinitializing agent...');
+		deinit();
+	}
+	
+
+	console.log('Removing agent...');
+	
+	fs.rm(workingPath, { recursive: true, force: true }, (err) => {
+		if (err) {
+			console.error('Error removing agent directory and files:', err);
+		} else {
+			console.log('Agent directory and files removed successfully.');
+		}
+	});
+
+
+	console.log('Done.');
+}
 
 if(action == 'run') {
 
@@ -451,7 +347,15 @@ if(action == 'run') {
 
                 init_stats();
 
-                if(runCount > 60) {
+				let fullStatsThreshold = 60;
+				if(type == 'workstation') {
+					fullStatsThreshold = 12;
+				}
+				if(type == 'server') {
+					fullStatsThreshold = 60;
+				}
+
+                if(runCount > fullStatsThreshold) {
                     setTimeout(run, 3000, true); // collecting all data
                     var newRunCount = 0; 
                 } else {
@@ -479,11 +383,202 @@ if(action == 'run') {
     }
 }
 
+
+if(action == 'init') {
+
+    let config = {};
+    config.key = key;
+    config.gateway = gateway;
+    config.type = type;
+    config.lastRun = null;
+    config.runCount = 0;
+    fs.writeFile(workingPath + '/config.json', JSON.stringify(config), function (err) { });
+
+
+    if(type == 'server' || type == 'workstation') {
+
+        if(platform == 'linux' || platform == 'freebsd' || platform == 'openbsd') {
+            console.log(platform + ' detected. Initializing with cron job...');
+
+			let nodePath = workingPath + '/node';
+			if (!fs.existsSync(nodePath)) {
+				console.error(`Node binary in ${nodePath} does not exist.`);
+				return;
+			}
+
+            let cron = "";
+            if(type == 'server') {
+                cron = '* * * * * ' + nodePath + ' ' + scriptPath + ' run';
+            }
+            if(type == 'workstation') {
+                cron = '0 * * * * ' + nodePath + ' ' + scriptPath + ' run';
+            }
+            
+            // Check if cron job already exists
+            exec('crontab -l', (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error checking cron jobs: ${error.message}`);
+                    return;
+                }
+                
+                if (stdout.includes(cron)) {
+                    console.log('Cron job already exists. Skipping...');
+                } else {
+                    // Add cron job
+                    exec(`(crontab -l 2>/dev/null; echo "${cron}") | crontab -`, (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(`Error adding cron job: ${error.message}`);
+                            return;
+                        }
+                        
+                        console.log('Cron job added successfully.');
+                    });
+                }
+            });
+
+        }
+
+        if(platform == 'win32') {
+            console.log(platform + ' detected. Initializing with task scheduler...');
+
+			let nodePath = workingPath + '/node.exe';
+			if (!fs.existsSync(nodePath)) {
+				console.error(`Node binary in ${nodePath} does not exist.`);
+				return;
+			}
+
+            let task = "";
+            if(type == 'server') {
+                task = 'schtasks /create /tn "nMon Pro Agent" /tr "' + nodePath + ' ' + scriptPath + ' run" /sc minute /mo 1 /ru SYSTEM';
+            }
+            if(type == 'workstation') {
+                task = 'schtasks /create /tn "nMon Pro Agent" /tr "' + nodePath + ' ' + scriptPath + ' run" /sc minute /mo 60 /ru SYSTEM';
+            }
+            
+            
+            exec(task, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error creating task: ${error.message}`);
+                    return;
+                }
+                
+                console.log('Task created successfully.');
+            });
+
+        }
+    
+        if(platform == 'darwin') {
+            console.log('MacOS detected. Initializing with launch daemon.');
+
+            StartInterval = 60;
+
+            if(type == 'server') {
+                StartInterval = 60;
+            }
+            if(type == 'workstation') {
+                StartInterval = 3600;
+            }
+
+
+			let nodePath = workingPath + '/node';
+			if (!fs.existsSync(nodePath)) {
+				console.error(`Node binary in ${nodePath} does not exist.`);
+				return;
+			}
+
+            const launchdPlist = `
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+                <dict>
+                    <key>Label</key>
+                    <string>com.codeniner.nmonpro.agent</string>
+                    <key>RunAtLoad</key>
+                    <true/>
+                    <key>StartInterval</key>
+                    <integer>` + StartInterval + `</integer>
+                    <key>StandardErrorPath</key>
+                    <string>` + workingPath + `/error.log</string>
+                    <key>StandardOutPath</key>
+                    <string>` + workingPath + `/agent.log</string>
+                    <key>EnvironmentVariables</key>
+                    <dict>
+                        <key>PATH</key>
+                        <string><![CDATA[/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin]]></string>
+                    </dict>
+                    <key>WorkingDirectory</key>
+                    <string>` + workingPath + `</string>
+                    <key>ProgramArguments</key>
+                    <array>
+                        <string>` + workingPath + `/node</string>
+                        <string>` + workingPath + `/agent.js</string>
+						<string>run</string>
+                    </array>
+                </dict>
+            </plist>
+            `;
+
+            fs.writeFile('/Library/LaunchDaemons/com.codeniner.nmonpro.agent.plist', launchdPlist, function (err) {
+                if (err) {
+                    console.error('Error creating launch daemon:', err);
+                } else {
+                    console.log('Launch daemon created successfully.');
+                    exec('launchctl load /Library/LaunchDaemons/com.codeniner.nmonpro.agent.plist', (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(`Error loading launch daemon: ${error.message}`);
+                            return;
+                        }
+                        
+                        console.log('Launch daemon loaded successfully.');
+                    });
+                }
+            });
+
+        }
+
+
+        console.log('Sending first data set to the server.');
+
+        init_stats();
+        setTimeout(run, 3000);
+
+
+        console.log('Done.');
+
+
+    }
+
+
+}
+
+
+if(action == 'deinit') {
+	deinit();
+}
+
+
+if(action == 'uninstall') {
+	uninstall();
+}
+
+
+if(action == 'update') {
+	self_update();
+}
+
 if(action == 'version') {
     console.log('nMon Pro Agent version - ' + agent_version + ' Running on ' + platform + ' ' + os.release() + ' ' + os.arch() + ' ' + os.type() + ' ' + os.platform() + ' ' + os.version() + ' ' + os.hostname()); 
 }
 
+if(action == 'paths') {
+    console.log('Script Path - ' + scriptPath); 
+    console.log('Working Dir Path - ' + workingPath); 
+    console.log('Script Name - ' + fileName); 
+}
+
+
 if(!action) {
     console.log('Action not specified.'); 
 }
+
 
