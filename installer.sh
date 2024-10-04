@@ -122,6 +122,6 @@ echo "-------------------------------------"
 
 
 # Attempt to delete this installer
-# if [ -f $0 ]; then
-# 	rm -f $0
-# fi
+if [ -f $0 ]; then
+	rm -f $0
+fi
