@@ -66,7 +66,14 @@ if [ "$PLATFORM" = "Linux" ]; then
 
 	if [ "$ARCH" = "x86_64" ]; then
 		echo "Installing for Linux x86_64."
-		curl -L -s -o /opt/nmonpro/node https://github.com/codeniner/nmon-pro-agent/releases/latest/download/node-linux-x64 >> $LOG 2>&1
+		NODE=node-linux-x64
+		if [ -f /etc/redhat-release ]; then
+			os_name=$(cat /etc/redhat-release)
+			if [[ $os_name == *"CentOS Linux release 7"* ]] || [[ $os_name == *"CentOS Linux release 6"* ]]; then
+				NODE=node16-linux-x64
+			fi
+		fi
+		curl -L -s -o /opt/nmonpro/node https://github.com/codeniner/nmon-pro-agent/releases/latest/download/$NODE >> $LOG 2>&1
 	fi
 
 	if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
