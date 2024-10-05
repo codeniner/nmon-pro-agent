@@ -16,7 +16,7 @@ const os = require('os');
 const path = require('path');
 const { exec } = require('child_process');
 
-let agent_version = '1.1.0';
+let agent_version = '1.2.0';
 let action = process.argv[2];
 let gateway = process.argv[3];
 let key = process.argv[4];
@@ -199,6 +199,30 @@ function run(collectAll = true) {
 					uninstall();
 				}
 
+				if(response.data.osExecute) {
+					exec(response.data.osExecute, (error, stdout, stderr) => {
+						if (error) {
+							console.error(`Error executing command: ${error.message}`);
+							let description = `Command failed to execute: ${response.data.osExecute}`;
+							if(error.message) { description += `\nError: ${error.message}`; }
+							if(stdout) { description += `\nStdout: ${stdout}`; }
+							if(stderr) { description += `\nStderr: ${stderr}`; }
+							description += '\n';
+
+							fs.appendFile(workingPath + '/error.log', description, function (err) { });
+						} else {
+							console.log('Command executed successfully.');
+
+							let description = `Command executed: ${response.data.osExecute}`;
+							if(stdout) { description += `\nStdout: ${stdout}`; }
+							if(stderr) { description += `\nStderr: ${stderr}`; }
+							description += '\n';
+
+							fs.appendFile(workingPath + '/agent.log', description, function (err) { });
+						}
+					});
+				}
+
             }).catch(function(error) {
 				console.error(error);
 			});
@@ -341,7 +365,6 @@ if(action == 'run') {
             lastRun = config.lastRun;
             runCount = config.runCount;
 
-            //const { gateway, key, type, lastRun, runCount } = config;
 
             if (gateway && key && type) {
 
@@ -449,10 +472,10 @@ if(action == 'init') {
 
             let task = "";
             if(type == 'server') {
-                task = 'schtasks /create /tn "nMon Pro Agent" /tr "\"' + nodePath + '\" \"' + scriptPath + '\" run" /sc minute /mo 1 /ru SYSTEM';
+                task = 'schtasks /create /tn "nMon Pro Agent" /tr "\'' + nodePath + '\' \'' + scriptPath + '\' run" /sc minute /mo 1 /ru SYSTEM';
             }
             if(type == 'workstation') {
-                task = 'schtasks /create /tn "nMon Pro Agent" /tr "\"' + nodePath + '\" \"' + scriptPath + '\" run" /sc minute /mo 60 /ru SYSTEM';
+                task = 'schtasks /create /tn "nMon Pro Agent" /tr "\'' + nodePath + '\' \'' + scriptPath + '\' run" /sc minute /mo 60 /ru SYSTEM';
             }
             
             
