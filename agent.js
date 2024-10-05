@@ -449,10 +449,10 @@ if(action == 'init') {
 
             let task = "";
             if(type == 'server') {
-                task = 'schtasks /create /tn "nMon Pro Agent" /tr "' + nodePath + ' ' + scriptPath + ' run" /sc minute /mo 1 /ru SYSTEM';
+                task = 'schtasks /create /tn "nMon Pro Agent" /tr "\"' + nodePath + '\" \"' + scriptPath + '\" run" /sc minute /mo 1 /ru SYSTEM';
             }
             if(type == 'workstation') {
-                task = 'schtasks /create /tn "nMon Pro Agent" /tr "' + nodePath + ' ' + scriptPath + ' run" /sc minute /mo 60 /ru SYSTEM';
+                task = 'schtasks /create /tn "nMon Pro Agent" /tr "\"' + nodePath + '\" \"' + scriptPath + '\" run" /sc minute /mo 60 /ru SYSTEM';
             }
             
             
